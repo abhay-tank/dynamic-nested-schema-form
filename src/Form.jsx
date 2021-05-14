@@ -29,7 +29,13 @@ import "ace-builds/src-noconflict/theme-xcode";
 import "ace-builds/src-noconflict/worker-json";
 import "ace-builds/webpack-resolver";
 
-export const Form = ({ formId, customSchema, form, onSubmit }) => {
+export const Form = ({
+	formId,
+	customSchema,
+	additionalFormAttributes,
+	form,
+	onSubmit,
+}) => {
 	const {
 		handleSubmit,
 		control,
@@ -595,7 +601,12 @@ export const Form = ({ formId, customSchema, form, onSubmit }) => {
 	};
 
 	return (
-		<form id={formId} noValidate onSubmit={handleSubmit(onSubmit)}>
+		<form
+			id={formId}
+			{...additionalFormAttributes}
+			noValidate
+			onSubmit={handleSubmit(onSubmit)}
+		>
 			{generateForm(customSchema)}
 		</form>
 	);

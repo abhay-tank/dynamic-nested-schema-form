@@ -324,6 +324,7 @@ export default function App() {
 				formId="myform"
 				customSchema={customSchema}
 				onSubmit={submitFormHandler}
+				additionalFormAttributes={{}}
 				form={form}
 			/>
 			<Button form="myform" variant="contained" color="primary" type="submit">
