@@ -21,6 +21,7 @@ import FormLabel from "@material-ui/core/FormLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
+import "ace-builds";
 import AceEditor from "react-ace";
 
 import "ace-builds/src-noconflict/ace";
@@ -28,7 +29,8 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-xcode";
 import "ace-builds/src-noconflict/snippets/json";
 import "ace-builds/src-min-noconflict/ext-language_tools";
-import "ace-builds/webpack-resolver";
+import jsonWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-json";
+ace.config.setModuleUrl("ace/mode/json_worker", jsonWorkerUrl);
 
 export const Form = ({
 	formId,
