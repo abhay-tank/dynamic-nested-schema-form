@@ -12,7 +12,6 @@ import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -313,35 +312,34 @@ export const Form = ({ customSchema, form, onSubmit }) => {
 			case "group":
 				const groupError = has(errors, name);
 				return (
-					<Accordion
+					<Paper
 						key={uid}
 						style={
 							groupError
-								? { borderLeft: "red 2px solid", margin: "10px 0" }
-								: { margin: "10px 0" }
+								? {
+										borderLeft: "red 2px solid",
+										margin: "10px 0",
+										padding: "20px",
+								  }
+								: { margin: "10px 0", padding: "20px" }
 						}
+						elevation={checkboxGroupErrorExist ? 3 : 1}
 					>
-						<AccordionSummary
-							expandIcon={<ExpandMoreIcon />}
-							aria-controls="panel1a-content"
-							id="panel1a-header"
+						<Typography style={{ margin: "10px 0" }} variant="h4">
+							{title}
+						</Typography>
+						<Grid
+							container
+							direction="column"
+							justify="space-between"
+							alignItems="stretch"
 						>
-							<Typography>{title}</Typography>
-						</AccordionSummary>
-						<AccordionDetails>
-							<Grid
-								container
-								direction="column"
-								justify="space-between"
-								alignItems="stretch"
-							>
-								{_schema.length > 0 &&
-									_schema.map((schemaObject) => {
-										return generateForm(schemaObject);
-									})}
-							</Grid>
-						</AccordionDetails>
-					</Accordion>
+							{_schema.length > 0 &&
+								_schema.map((schemaObject) => {
+									return generateForm(schemaObject);
+								})}
+						</Grid>
+					</Paper>
 				);
 			case "checkboxAccordian":
 				const checkboxAccordianError = has(errors, name);
