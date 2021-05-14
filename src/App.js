@@ -3,6 +3,8 @@ import shortid from "shortid";
 import { Form } from "./Form";
 import { useForm } from "react-hook-form";
 import isEmpty from "lodash/isEmpty";
+import Button from "@material-ui/core/Button";
+
 export default function App() {
 	const form = useForm({
 		mode: "all",
@@ -309,13 +311,24 @@ export default function App() {
 	const submitFormHandler = (data) => {
 		console.log("Form Data => ", data);
 	};
+	const actions = [
+		{
+			id: "",
+			label: "",
+			handler: () => {},
+		},
+	];
 	return (
 		<div>
 			<Form
+				formId="myform"
 				customSchema={customSchema}
 				onSubmit={submitFormHandler}
 				form={form}
 			/>
+			<Button form="myform" variant="contained" color="primary" type="submit">
+				submit form
+			</Button>
 		</div>
 	);
 }
