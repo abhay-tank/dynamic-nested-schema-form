@@ -23,6 +23,7 @@ import FormGroup from "@material-ui/core/FormGroup";
 import Divider from "@material-ui/core/Divider";
 import "ace-builds";
 import AceEditor from "react-ace";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-json";
@@ -45,7 +46,10 @@ export const Form = ({
 		setValue,
 		setError,
 		formState: { errors },
+		unregister,
+		watch,
 	} = form;
+	console.log(watch());
 
 	const generateForm = (schema) => {
 		const {
@@ -350,6 +354,39 @@ export const Form = ({
 						</Grid>
 					</Paper>
 				);
+			case "groupAccordian":
+				const groupAccordianError = has(errors, name);
+				return (
+					<Accordion
+						key={uid}
+						style={
+							groupAccordianError
+								? { borderLeft: "red 2px solid", margin: "10px 0" }
+								: { margin: "10px 0" }
+						}
+					>
+						<AccordionSummary
+							expandIcon={<ExpandMoreIcon />}
+							aria-controls="panel1a-content"
+							id="panel1a-header"
+						>
+							<Typography>{title}</Typography>
+						</AccordionSummary>
+						<AccordionDetails>
+							<Grid
+								container
+								direction="column"
+								justify="space-between"
+								alignItems="stretch"
+							>
+								{_schema.length > 0 &&
+									_schema.map((schemaObject) => {
+										return generateForm(schemaObject);
+									})}
+							</Grid>
+						</AccordionDetails>
+					</Accordion>
+				);
 			case "checkboxAccordian":
 				const checkboxAccordianError = has(errors, name);
 				return (
@@ -383,6 +420,18 @@ export const Form = ({
 													name={`${name}.value`}
 													checked={value.value}
 													onChange={async () => {
+														const groupElements = Object.keys(value);
+														console.log("Children => ", groupElements);
+														console.log("CheckboxAccordian name => ", name);
+														// When checkbox is unticked
+														if (!value.value === false) {
+															groupElements.forEach((element) => {
+																unregister(`${name}.${element}`, {
+																	keepValue: false,
+																});
+															});
+															setValue(name, {});
+														}
 														const updatedCheckboxAccordianValue = {
 															...value,
 														};

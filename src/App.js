@@ -13,7 +13,7 @@ export default function App() {
 		context: undefined,
 		criteriaMode: "all",
 		shouldFocusError: true,
-		shouldUnregister: false,
+		shouldUnregister: true,
 	});
 	const primitive = ["text", "number", "date", "select", "fileUpload"];
 	const groupType = [
@@ -144,6 +144,47 @@ export default function App() {
 				_schema: [],
 			},
 			{
+				title: "Avail Offers",
+				uid: shortid.generate(),
+				name: "employee.offers",
+				type: "groupAccordian",
+				validations: {},
+				defaultValue: "",
+				field_metadata: {
+					options: [],
+				},
+				_schema: [
+					{
+						title: "Name",
+						uid: shortid.generate(),
+						name: "employee.offers.name",
+						type: "text",
+						defaultValue: "Abhay",
+						validations: {
+							required: "Name is required",
+						},
+						field_metadata: {
+							options: [],
+						},
+						_schema: [],
+					},
+					{
+						title: "Age",
+						uid: shortid.generate(),
+						name: "employee.offers.age",
+						type: "number",
+						defaultValue: "22",
+						validations: {
+							required: "Age is required",
+						},
+						field_metadata: {
+							options: [],
+						},
+						_schema: [],
+					},
+				],
+			},
+			{
 				title: "Address",
 				uid: shortid.generate(),
 				type: "group",
@@ -232,7 +273,7 @@ export default function App() {
 				type: "checkboxAccordian",
 				defaultValue: { value: false },
 				validations: {
-					validate: (values) => values.value,
+					// validate: (values) => values.value,
 				},
 				field_metadata: {},
 				_schema: [
