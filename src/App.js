@@ -91,44 +91,110 @@ export default function App() {
         },
         field_metadata: {
           options: [
-            { label: "Friends", value: "friends",mapSchema:["employee.characterName"], },
-            { label: "Doctor House", value: "doctorHouse",mapSchema:[] },
-            { label: "Mr. Robot", value: "mrRobot",mapSchema:["employee.episode"] },
+            {
+              label: "Friends",
+              value: "friends",
+              mapSchema: ["employee.characterName"],
+            },
+            { label: "Doctor House", value: "doctorHouse", mapSchema: [] },
+            {
+              label: "Mr. Robot",
+              value: "mrRobot",
+              mapSchema: ["employee.episode"],
+            },
           ],
         },
         _schema: [
-			{
-				title: "Friends Fav character",
-				uid: shortid.generate(),
-				name: "employee.characterName",
-				type: "text",
-				defaultValue: "",
-				validations: {
-				  required: "Name is required",
-				},
-				field_metadata: {
-				  options: [],
-				},
-				_schema: [],
-			  },
-			  {
-				title: "Currently on which episode ",
-				uid: shortid.generate(),
-				name: "employee.episode",
-				type: "number",
-				defaultValue: "",
-				validations: {
-				  required: "Episode number is required",
-				},
-				field_metadata: {
-				  options: [],
-				},
-				_schema: [],
-			  }
-
-		],
+          {
+            title: "Friends Fav character",
+            uid: shortid.generate(),
+            name: "employee.characterName",
+            type: "text",
+            defaultValue: "",
+            validations: {
+              required: "Name is required",
+            },
+            field_metadata: {
+              options: [],
+            },
+            _schema: [],
+          },
+          {
+            title: "Currently on which episode ",
+            uid: shortid.generate(),
+            name: "employee.episode",
+            type: "number",
+            defaultValue: "",
+            validations: {
+              required: "Episode number is required",
+            },
+            field_metadata: {
+              options: [],
+            },
+            _schema: [],
+          },
+        ],
       },
-
+      {
+        title: "What is your Gender?",
+        uid: shortid.generate(),
+        name: "employee.gender",
+        type: "radio",
+        defaultValue: "male",
+        validations: {
+          required: "Gender is required",
+        },
+        field_metadata: {
+          options: [
+            { label: "Male", value: "male", mapSchema: ["employee.company"] },
+            {
+              label: "Female",
+              value: "female",
+              mapSchema: ["employee.company"],
+            },
+            { label: "Others", value: "others", mapSchema: [] },
+          ],
+        },
+        _schema: [
+          {
+            title: "What is your Company name?",
+            uid: shortid.generate(),
+            name: "employee.company",
+            type: "radio",
+            defaultValue: "dfe",
+            validations: {
+              required: "Fav show is required",
+            },
+            field_metadata: {
+              options: [
+                { label: "Raw engineering", value: "raw", mapSchema: ["employee.salary"] },
+                { label: "ContentStack", value: "cs", mapSchema: [] },
+                { label: "DFEP", value: "dfe", mapSchema: [] },
+              ],
+            },
+            _schema: [
+              {
+                title: "What is your Slaray?",
+                uid: shortid.generate(),
+                name: "employee.salary",
+                type: "radio",
+                defaultValue: "8L",
+                validations: {
+                  required: "Fav show is required",
+                },
+                field_metadata: {
+                  options: [
+                    { label: "10 Lakhs", value: "10L", mapSchema: [] },
+                    { label: "9 Lakh", value: "9L", mapSchema: [] },
+                    { label: "8 Lakh", value: "8L", mapSchema: [] },
+                  ],
+                },
+                _schema: [],
+              },
+            ],
+          },
+        ],
+      },
       {
         title: "",
         uid: shortid.generate(),
