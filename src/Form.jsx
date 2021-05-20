@@ -52,7 +52,7 @@ export const Form = ({
   } = form;
   console.log(watch());
 
-  const generateForm = (schema) => {
+  const generateForm = schema => {
     const {
       uid,
       name,
@@ -173,7 +173,7 @@ export const Form = ({
                     {...field}
                     inputRef={field.ref}
                   >
-                    {options.map((option) => (
+                    {options.map(option => (
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
                       </MenuItem>
@@ -201,9 +201,7 @@ export const Form = ({
                         {...field}
                         checked={field.value}
                         name={field.name}
-                        onChange={(event) =>
-                          field.onChange(event.target.checked)
-                        }
+                        onChange={event => field.onChange(event.target.checked)}
                       />
                     }
                     label={title}
@@ -247,40 +245,45 @@ export const Form = ({
                       <>
                         <RadioGroup
                           value={value}
-                          onChange={(e) => {
+                          onChange={e => {
                             setValue(name, e.target.value, {
                               shouldValidate: true,
                             });
                           }}
                         >
-                          {options.map(({ label, value:radioValue ,mapSchema}, index) => (
-                            <div key={`${uid}-${radioValue}${label}${index}`}>
-                              <FormControlLabel
-                                // key={`${uid}-${value}${label}${index}`}
-                                value={radioValue}
-                                control={
-                                  <Radio
-                                    key={`radioButton-${uid}${value}${label}${index}`}
-                                  />
-                                }
-                                label={label}
-                              />
+                          {options.map(
+                            (
+                              { label, value: radioValue, mapSchema },
+                              index,
+                            ) => (
+                              <div key={`${uid}-${radioValue}${label}${index}`}>
+                                <FormControlLabel
+                                  // key={`${uid}-${value}${label}${index}`}
+                                  value={radioValue}
+                                  control={
+                                    <Radio
+                                      key={`radioButton-${uid}${value}${label}${index}`}
+                                    />
+                                  }
+                                  label={label}
+                                />
 
-                              {_schema.length > 0 &&
-                                mapSchema?.length > 0 &&
-                                mapSchema.map((schemaName) => {
-                                  return (
-                                    radioValue === value &&
-                                    generateForm(
-                                      _schema.find(
-                                        (schemaObject) =>
-                                          schemaObject.name === schemaName
+                                {_schema.length > 0 &&
+                                  mapSchema?.length > 0 &&
+                                  mapSchema.map(schemaName => {
+                                    return (
+                                      radioValue === value &&
+                                      generateForm(
+                                        _schema.find(
+                                          schemaObject =>
+                                            schemaObject.name === schemaName,
+                                        ),
                                       )
-                                    )
-                                  );
-                                })}
-                            </div>
-                          ))}
+                                    );
+                                  })}
+                              </div>
+                            ),
+                          )}
                         </RadioGroup>
                         {hasFieldError && (
                           <FormHelperText>{fieldError.message}</FormHelperText>
@@ -333,7 +336,7 @@ export const Form = ({
                           {options.map(
                             (
                               { label, value, name: checkboxName, mapSchema },
-                              index
+                              index,
                             ) => (
                               <div key={`${uid}-${value}${label}${index}`}>
                                 {generateForm({
@@ -349,19 +352,19 @@ export const Form = ({
 
                                 {_schema.length > 0 &&
                                   mapSchema?.length > 0 &&
-                                  mapSchema.map((values) => {
+                                  mapSchema.map(values => {
                                     return (
                                       checkboxValue[checkboxName] &&
                                       generateForm(
                                         _schema.find(
-                                          (schemaObject) =>
-                                            schemaObject.name === values
-                                        )
+                                          schemaObject =>
+                                            schemaObject.name === values,
+                                        ),
                                       )
                                     );
                                   })}
                               </div>
-                            )
+                            ),
                           )}
                         </FormGroup>
                         {hasFieldError && (
@@ -401,7 +404,7 @@ export const Form = ({
               alignItems="stretch"
             >
               {_schema.length > 0 &&
-                _schema.map((schemaObject) => {
+                _schema.map(schemaObject => {
                   return generateForm(schemaObject);
                 })}
             </Grid>
@@ -433,7 +436,7 @@ export const Form = ({
                 alignItems="stretch"
               >
                 {_schema.length > 0 &&
-                  _schema.map((schemaObject) => {
+                  _schema.map(schemaObject => {
                     return generateForm(schemaObject);
                   })}
               </Grid>
@@ -478,7 +481,7 @@ export const Form = ({
                             console.log("CheckboxAccordian name => ", name);
                             // When checkbox is unticked
                             if (!value.value === false) {
-                              groupElements.forEach((element) => {
+                              groupElements.forEach(element => {
                                 unregister(`${name}.${element}`, {
                                   keepValue: false,
                                 });
@@ -511,7 +514,7 @@ export const Form = ({
                       alignItems="stretch"
                     >
                       {_schema.length > 0 &&
-                        _schema.map((schemaObject) => {
+                        _schema.map(schemaObject => {
                           return generateForm(schemaObject);
                         })}
                     </Grid>
@@ -569,7 +572,7 @@ export const Form = ({
                           ref={ref}
                           onBlur={onBlur}
                           {...fileOptions}
-                          onChange={(e) => {
+                          onChange={e => {
                             setValue(name, e.target.files, {
                               shouldValidate: true,
                             });
@@ -625,7 +628,7 @@ export const Form = ({
                 const { errors } = formState;
                 const hasFieldError = has(errors, name);
                 const fieldError = get(errors, name);
-                const onError = (node) => {
+                const onError = node => {
                   if (node.length) {
                     setError(name, {
                       type: node[0].type,
@@ -640,13 +643,13 @@ export const Form = ({
                   >
                     <AceEditor
                       value={value}
-                      onValidate={(node) => {
+                      onValidate={node => {
                         if (node.length) {
-                          onError(node.filter((err) => err.type === "error"));
+                          onError(node.filter(err => err.type === "error"));
                         }
                         onError([]);
                       }}
-                      onChange={(newValue) => {
+                      onChange={newValue => {
                         onChange(newValue);
                       }}
                       name={name}
