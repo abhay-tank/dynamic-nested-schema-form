@@ -1,149 +1,196 @@
-import React, { useEffect, useState } from "react";
-import shortid from "shortid";
-import { Form } from "../Form";
-import { useForm } from "react-hook-form";
-import isEmpty from "lodash/isEmpty";
-import Button from "@material-ui/core/Button";
-import { cloneDeep, set, get } from "lodash";
+import React from "react";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
+import AddIcon from "@material-ui/icons/AddCircleOutlineOutlined";
+import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
+import DeleteIcon from "@material-ui/icons/Delete";
+import { Button } from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
 
-export const NestedAccordian = () => {
-  const _schema = [];
+const type = [
+  {
+    value: "text",
+    label: "Text",
+  },
+  {
+    value: "boolean",
+    label: "Boolean",
+  },
+  {
+    value: "group",
+    label: "Group",
+  },
+  {
+    value: "mixed",
+    label: "Mixed",
+  },
+  {
+    value: "RTE",
+    label: "RTE",
+  },
+];
 
-  const form = useForm({
-    mode: "all",
-    reValidateMode: "all",
-    criteriaMode: "all",
-    shouldFocusError: true,
-    shouldUnregister: true,
-  });
-  const {
-    setValue,
-    getValues,
-    watch,
-    trigger,
-    formState: { errors },
-  } = form;
-  const primitive = ["text", "number", "date", "select", "fileUpload"];
-  const groupType = [
-    "group",
-    "radioGroup",
-    "checkboxGroup",
-    "checkboxAccordian",
-  ];
-  const [schema, setSchema] = useState([]);
+const addOption = [
+  {
+    value: "mandatory",
+    label: "Mandatory",
+  },
+  {
+    value: "Mutline",
+    label: "Mutline",
+  },
+  {
+    value: "Multiple",
+    label: "Multiple",
+  },
+];
 
-
-  const onPush = async (e) => {
-    e.stopPropagation();
-    const fieldNumber = schema.length;
-     await trigger([
-      `country[${fieldNumber - 1}].state`,
-      `country[${fieldNumber - 1}].city`,
-    ]);
-
-    if (errors?.country) {
-      e.target.disabled = true;
-    } else {
-      const pushedSchema = {
-        title: `Country-${fieldNumber}`,
-        name: ``,
-        uid: shortid.generate(),
-        field_metadata: {
-          showDeleteButton: true,
-          deleteButtonProps: {
-            variant: "contained",
-            color: "primary",
-            type: "button",
-            onClick: (e) => { e.stopPropagation();  onDelete(fieldNumber)},
-          },
-          options: [],
-        },
-        defaultValue: "",
-        validations: {},
-        type: "groupAccordian",
-        _schema: [
-          {
-            title: "State Name",
-            uid: shortid.generate(),
-            name: `country[${fieldNumber}].state`,
-            type: "text",
-            defaultValue: "",
-            validations: {
-              required: "Name is required",
-            },
-            field_metadata: {
-              options: [],
-            },
-            _schema: [],
-          },
-          {
-            title: "city",
-            uid: shortid.generate(),
-            name: `country[${fieldNumber}].city`,
-            type: "text",
-            defaultValue: "",
-            validations: {
-              required: "Name is required",
-            },
-            field_metadata: {
-              options: [],
-            },
-            _schema: [],
-          },
-        ],
-      };
-      setSchema(cloneDeep(schema.push(cloneDeep(pushedSchema))));
-      // setSchema(prevProp=>console.log(prevProp))
-    }
-  };
-
-  const onDelete = (index) => {
-    console.log("delet-->", index);
-
-    schema.length > 0 ? setSchema(cloneDeep(schema.splice(index, 1))) : null;
-  };
-
-  console.log(getValues());
-
-  const [mainSchema, setMainSchema] = useState({
-    title: "Country",
-    name: `country[${schema.length}]`,
-    uid: shortid.generate(),
-    field_metadata: {
-      showAddButton: true,
-      addButtonProps: {
-        variant: "contained",
-        color: "primary",
-        type: "button",
-        onClick: onPush,
-      },
-      options: [],
+function NestedSchema() {
+  const { control, watch, handleSubmit } = useForm({
+    defaultValues: {
+      demo: [{ fieldName: "", displayName: "", type: "text", addOption: "" }],
     },
-    defaultValue: {},
-    validations: {},
-    type: "groupAccordian",
-    _schema: schema,
   });
 
-  useEffect(() => {}, [schema]);
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
+    {
+      control,
+      name: "demo",
+    }
+  );
 
-  const submitFormHandler = (data) => {
-    console.log("Form Data => ", data);
-  };
+  // console.log("watch--->",watch())
+  const onSubmit = (data) => console.log("data", data);
 
   return (
-    <div>
-      <Form
-        formId="myform"
-        customSchema={mainSchema}
-        onSubmit={submitFormHandler}
-        additionalFormAttributes={{}}
-        // watchList={["city"]}
-        form={form}
-      />
-      <Button form="myform" variant="contained" color="primary" type="submit">
-        submit form
-      </Button>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Paper style={{ margin: "10px 0", padding: "20px" }} elevation={3}>
+        <Grid
+          container
+          direction="column"
+          justify="space-between"
+          alignItems="flex-end"
+        >
+          <IconButton
+            color="primary"
+            component="span"
+            variant="contained"
+            onClick={() => {
+              append({ fieldName: "", displayName: "", type: "text", addOption: "" });
+            }}
+          >
+            <AddIcon />
+          </IconButton>
+        </Grid>
+        <Grid
+          container
+          direction="column"
+          justify="space-between"
+          alignItems="stretch"
+        >
+          {fields.map((item, index) => {
+            return (
+              <Grid style={{ margin: "20px" }} item key={item.id}>
+                <Controller
+                  render={({ field: { ref, ...inputProps } }) => (
+                    <TextField
+                      style={{ margin: "0 10px" }}
+                      label="Field"
+                      variant="outlined"
+                      inputRef={ref}
+                      {...inputProps}
+                    />
+                  )}
+                  name={`demo.${index}.fieldName`}
+                  control={control}
+                  defaultValue={item.firstName}
+                />
+
+                <Controller
+                  render={({ field: { ref, ...inputProps } }) => (
+                    <TextField
+                      style={{ margin: "0 10px" }}
+                      label="value"
+                      variant="outlined"
+                      inputRef={ref}
+                      {...inputProps}
+                    />
+                  )}
+                  name={`demo.${index}.displayName`}
+                  control={control}
+                  defaultValue={item.displayName}
+                />
+
+                <Controller
+                  render={({ field: { ref, ...inputProps } }) => (
+                    <TextField
+                      style={{ margin: "0 10px", width: "200px" }}
+                      label="Type"
+                      variant="outlined"
+                      inputRef={ref}
+                      select
+                      {...inputProps}
+                    >
+                      {type.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                  name={`demo.${index}.type`}
+                  control={control}
+                  defaultValue={item.type}
+                />
+
+                <Controller
+                  render={({ field: { ref, ...inputProps } }) => (
+                    <TextField
+                      style={{ margin: "0 10px", width: "200px" }}
+                      label="Additional Options"
+                      variant="outlined"
+                      inputRef={ref}
+                      select
+                      {...inputProps}
+                    >
+                      {addOption.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  )}
+                  name={`demo.${index}.addOption`}
+                  control={control}
+                  defaultValue={item.addOption}
+                />
+
+                <IconButton
+                  aria-label="delete"
+                  component="span"
+                  onClick={() => remove(index)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Grid>
+            );
+          })}
+        </Grid>
+        <Grid
+          container
+          direction="column"
+          justify="space-between"
+          alignItems="flex-end"
+        >
+          <Button variant="contained" color="primary" type="submit">
+            submit
+          </Button>
+        </Grid>
+      </Paper>
+    </form>
   );
-};
+}
+
+export default NestedSchema;

@@ -46,9 +46,9 @@ export const Form = ({
     handleSubmit,
     control,
     setValue,
+    getValues,
     setError,
     formState: { errors },
-    unregister,
     watch,
   } = form;
   watchList?.length > 0
@@ -60,7 +60,7 @@ export const Form = ({
 
   const [pushedSchema, setPushedSchema] = useState([]);
 
-  const generateForm = (schema) => {
+  const generateForm = (schema, index) => {
     const {
       uid,
       name,
@@ -165,28 +165,49 @@ export const Form = ({
               control={control}
               rules={validations}
               defaultValue={defaultValue}
-              render={({ field, fieldState, formState }) => {
+              render={({ field, formState }) => {
                 const { errors } = formState;
                 const hasFieldError = has(errors, name);
                 const fieldError = get(errors, name);
+
+                let selectValue;
                 return (
-                  <TextField
-                    fullWidth
-                    label={title}
-                    type="date"
-                    variant="outlined"
-                    error={hasFieldError}
-                    select
-                    helperText={hasFieldError && fieldError.message}
-                    {...field}
-                    inputRef={field.ref}
-                  >
-                    {options.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                  <>
+                    <TextField
+                      fullWidth
+                      label={title}
+                      variant="outlined"
+                      error={hasFieldError}
+                      select
+                      helperText={hasFieldError && fieldError.message}
+                      {...field}
+                      onChange={(e)=>{
+                        console.log("--->",e.target.value)
+                        _schema.length > 0 && field_metadata?.mapSchema[e.target.value] && field_metadata?.mapSchema.map
+
+                        field.onChange(e.target.value)
+
+                      }}
+                      inputRef={field.ref}
+                    >
+                      {options.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    {_schema.length > 0 && field_metadata?.mapSchema[getValues(`${name}`)] &&
+                      field_metadata.mapSchema[getValues(`${name}`)]?.length > 0 &&
+                      field_metadata.mapSchema[getValues(`${name}`)].map((schemaName) => {
+                        return (
+                          generateForm(
+                            _schema.find(
+                              (schemaObject) => schemaObject.name === schemaName
+                            )
+                          )
+                        );
+                      })}
+                  </>
                 );
               }}
             />
@@ -424,8 +445,6 @@ export const Form = ({
       case "groupAccordian":
         const groupAccordianError = has(errors, name);
 
-
-
         return (
           <>
             <Accordion
@@ -442,7 +461,7 @@ export const Form = ({
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography>{title}</Typography>
+                <Typography>{title || index}</Typography>
 
                 {!!field_metadata?.showAddButton && (
                   <Button {...field_metadata?.addButtonProps}>Add</Button>
@@ -459,8 +478,8 @@ export const Form = ({
                   alignItems="stretch"
                 >
                   {_schema.length > 0 &&
-                    _schema.map((schemaObject) => {
-                      return generateForm(schemaObject);
+                    _schema.map((schemaObject, index) => {
+                      return generateForm(schemaObject, index);
                     })}
                 </Grid>
               </AccordionDetails>
