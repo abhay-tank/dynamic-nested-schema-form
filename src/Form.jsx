@@ -34,6 +34,24 @@ import { InputLabel } from "@material-ui/core";
 ace.config.setModuleUrl("ace/mode/json_worker", jsonWorkerUrl);
 import { useWatch } from "react-hook-form";
 
+
+let jsonPrevValue=""
+
+
+const isJS=(value)=>{
+  try{
+
+    JSON.parse(`${value}`)
+    return true
+
+  }
+  catch(err){
+    return false
+
+  }
+
+}
+
 export const Form = ({
   formId,
   customSchema,
@@ -59,6 +77,9 @@ export const Form = ({
     : null;
 
   const [pushedSchema, setPushedSchema] = useState([]);
+
+  const covertToObject = (value) => {};
+
 
   const generateForm = (schema, index) => {
     const {
@@ -181,12 +202,13 @@ export const Form = ({
                       select
                       helperText={hasFieldError && fieldError.message}
                       {...field}
-                      onChange={(e)=>{
-                        console.log("--->",e.target.value)
-                        _schema.length > 0 && field_metadata?.mapSchema[e.target.value] && field_metadata?.mapSchema.map
+                      onChange={(e) => {
+                        console.log("--->", e.target.value);
+                        _schema.length > 0 &&
+                          field_metadata?.mapSchema[e.target.value] &&
+                          field_metadata?.mapSchema.map;
 
-                        field.onChange(e.target.value)
-
+                        field.onChange(e.target.value);
                       }}
                       inputRef={field.ref}
                     >
@@ -196,17 +218,19 @@ export const Form = ({
                         </MenuItem>
                       ))}
                     </TextField>
-                    {_schema.length > 0 && field_metadata?.mapSchema[getValues(`${name}`)] &&
-                      field_metadata.mapSchema[getValues(`${name}`)]?.length > 0 &&
-                      field_metadata.mapSchema[getValues(`${name}`)].map((schemaName) => {
-                        return (
-                          generateForm(
+                    {_schema.length > 0 &&
+                      field_metadata?.mapSchema[getValues(`${name}`)] &&
+                      field_metadata.mapSchema[getValues(`${name}`)]?.length >
+                        0 &&
+                      field_metadata.mapSchema[getValues(`${name}`)].map(
+                        (schemaName) => {
+                          return generateForm(
                             _schema.find(
                               (schemaObject) => schemaObject.name === schemaName
                             )
-                          )
-                        );
-                      })}
+                          );
+                        }
+                      )}
                   </>
                 );
               }}
@@ -685,7 +709,11 @@ export const Form = ({
                     error={hasFieldError}
                   >
                     <AceEditor
-                      value={value}
+                      value={
+                        typeof value === typeof {}
+                          ? JSON.stringify(value)
+                          : value
+                      }
                       onValidate={(node) => {
                         if (node.length) {
                           onError(node.filter((err) => err.type === "error"));
@@ -693,7 +721,26 @@ export const Form = ({
                         onError([]);
                       }}
                       onChange={(newValue) => {
-                        onChange(newValue);
+
+                        console.log("prevValue-->",jsonPrevValue)
+
+                        
+                        console.log("newvalue-->", newValue)
+                        
+                        if(isJS(newValue)){
+                          try {
+
+                            onChange(JSON.parse( `${newValue}` ));
+                          
+                            jsonPrevValue=newValue
+                          } catch (err) {
+                            onChange(newValue);
+                            jsonPrevValue=newValue
+                          
+                          }}else{
+                          onChange(newValue);
+                          jsonPrevValue=newValue
+                        }
                       }}
                       name={name}
                       setOptions={{

@@ -7,8 +7,8 @@ export default function App() {
 
   return(
     <>
-  {/* <GroupSchema/> */}
-    <NestedAccordian/>
+  <GroupSchema/>
+    {/* <NestedAccordian/> */}
     </>
   )
  

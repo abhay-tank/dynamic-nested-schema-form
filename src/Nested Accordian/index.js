@@ -52,6 +52,7 @@ function NestedSchema() {
     defaultValues: {
       demo: [{ fieldName: "", displayName: "", type: "text", addOption: "" }],
     },
+
   });
 
   const { fields, append, prepend, remove, swap, move, insert } = useFieldArray(
@@ -62,7 +63,7 @@ function NestedSchema() {
   );
 
   // console.log("watch--->",watch())
-  const onSubmit = (data) => console.log("data", data);
+  const onSubmit = (data) => console.log("data",    );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -78,7 +79,12 @@ function NestedSchema() {
             component="span"
             variant="contained"
             onClick={() => {
-              append({ fieldName: "", displayName: "", type: "text", addOption: "" });
+              prepend({
+                fieldName: "",
+                displayName: "",
+                type: "text",
+                addOption: "",
+              });
             }}
           >
             <AddIcon />
@@ -93,11 +99,12 @@ function NestedSchema() {
           {fields.map((item, index) => {
             return (
               <Grid style={{ margin: "20px" }} item key={item.id}>
+                
                 <Controller
                   render={({ field: { ref, ...inputProps } }) => (
                     <TextField
                       style={{ margin: "0 10px" }}
-                      label="Field"
+                      label={`${index}`}
                       variant="outlined"
                       inputRef={ref}
                       {...inputProps}
@@ -181,7 +188,7 @@ function NestedSchema() {
         <Grid
           container
           direction="column"
-          justify="space-between"
+          justify="space-evenly"
           alignItems="flex-end"
         >
           <Button variant="contained" color="primary" type="submit">
