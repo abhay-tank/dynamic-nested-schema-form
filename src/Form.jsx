@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
@@ -24,7 +24,6 @@ import Divider from "@material-ui/core/Divider";
 import "ace-builds";
 import AceEditor from "react-ace";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-
 import "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-xcode";
@@ -33,11 +32,31 @@ import "ace-builds/src-min-noconflict/ext-language_tools";
 import jsonWorkerUrl from "file-loader!ace-builds/src-noconflict/worker-json";
 import { InputLabel } from "@material-ui/core";
 ace.config.setModuleUrl("ace/mode/json_worker", jsonWorkerUrl);
+import { useWatch } from "react-hook-form";
+
+
+let jsonPrevValue=""
+
+
+const isJS=(value)=>{
+  try{
+
+    JSON.parse(`${value}`)
+    return true
+
+  }
+  catch(err){
+    return false
+
+  }
+
+}
 
 export const Form = ({
   formId,
   customSchema,
   additionalFormAttributes,
+  watchList,
   form,
   onSubmit,
 }) => {
@@ -45,14 +64,24 @@ export const Form = ({
     handleSubmit,
     control,
     setValue,
+    getValues,
     setError,
     formState: { errors },
-    unregister,
     watch,
   } = form;
-  console.log(watch());
+  watchList?.length > 0
+    ? useWatch({
+        name: watchList,
+        control,
+      })
+    : null;
 
-  const generateForm = schema => {
+  const [pushedSchema, setPushedSchema] = useState([]);
+
+  const covertToObject = (value) => {};
+
+
+  const generateForm = (schema, index) => {
     const {
       uid,
       name,
@@ -157,28 +186,52 @@ export const Form = ({
               control={control}
               rules={validations}
               defaultValue={defaultValue}
-              render={({ field, fieldState, formState }) => {
+              render={({ field, formState }) => {
                 const { errors } = formState;
                 const hasFieldError = has(errors, name);
                 const fieldError = get(errors, name);
+
+                let selectValue;
                 return (
-                  <TextField
-                    fullWidth
-                    label={title}
-                    type="date"
-                    variant="outlined"
-                    error={hasFieldError}
-                    select
-                    helperText={hasFieldError && fieldError.message}
-                    {...field}
-                    inputRef={field.ref}
-                  >
-                    {options.map(option => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                  <>
+                    <TextField
+                      fullWidth
+                      label={title}
+                      variant="outlined"
+                      error={hasFieldError}
+                      select
+                      helperText={hasFieldError && fieldError.message}
+                      {...field}
+                      onChange={(e) => {
+                        console.log("--->", e.target.value);
+                        _schema.length > 0 &&
+                          field_metadata?.mapSchema[e.target.value] &&
+                          field_metadata?.mapSchema.map;
+
+                        field.onChange(e.target.value);
+                      }}
+                      inputRef={field.ref}
+                    >
+                      {options.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                    {_schema.length > 0 &&
+                      field_metadata?.mapSchema[getValues(`${name}`)] &&
+                      field_metadata.mapSchema[getValues(`${name}`)]?.length >
+                        0 &&
+                      field_metadata.mapSchema[getValues(`${name}`)].map(
+                        (schemaName) => {
+                          return generateForm(
+                            _schema.find(
+                              (schemaObject) => schemaObject.name === schemaName
+                            )
+                          );
+                        }
+                      )}
+                  </>
                 );
               }}
             />
@@ -207,6 +260,7 @@ export const Form = ({
                     label={title}
                   />
                 );
+                _schema.length > 0 && field_metadata.mapSchema;
               }}
             />
           </Grid>
@@ -254,7 +308,7 @@ export const Form = ({
                           {options.map(
                             (
                               { label, value: radioValue, mapSchema },
-                              index,
+                              index
                             ) => (
                               <div key={`${uid}-${radioValue}${label}${index}`}>
                                 <FormControlLabel
@@ -270,19 +324,19 @@ export const Form = ({
 
                                 {_schema.length > 0 &&
                                   mapSchema?.length > 0 &&
-                                  mapSchema.map(schemaName => {
+                                  mapSchema.map((schemaName) => {
                                     return (
                                       radioValue === value &&
                                       generateForm(
                                         _schema.find(
-                                          schemaObject =>
-                                            schemaObject.name === schemaName,
-                                        ),
+                                          (schemaObject) =>
+                                            schemaObject.name === schemaName
+                                        )
                                       )
                                     );
                                   })}
                               </div>
-                            ),
+                            )
                           )}
                         </RadioGroup>
                         {hasFieldError && (
@@ -412,36 +466,47 @@ export const Form = ({
         );
       case "groupAccordian":
         const groupAccordianError = has(errors, name);
+
         return (
-          <Accordion
-            key={uid}
-            style={
-              groupAccordianError
-                ? { borderLeft: "red 2px solid", margin: "10px 0" }
-                : { margin: "10px 0" }
-            }
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+          <>
+            <Accordion
+              key={uid}
+              defaultExpanded={true}
+              style={
+                groupAccordianError
+                  ? { borderLeft: "red 2px solid", margin: "10px 0" }
+                  : { margin: "10px 0" }
+              }
             >
-              <Typography>{title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid
-                container
-                direction="column"
-                justify="space-between"
-                alignItems="stretch"
+              <AccordionSummary
+                expandIcon={[<ExpandMoreIcon />]}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
               >
-                {_schema.length > 0 &&
-                  _schema.map(schemaObject => {
-                    return generateForm(schemaObject);
-                  })}
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+                <Typography>{title || index}</Typography>
+
+                {!!field_metadata?.showAddButton && (
+                  <Button {...field_metadata?.addButtonProps}>Add</Button>
+                )}
+                {!!field_metadata?.showDeleteButton && (
+                  <Button {...field_metadata?.deleteButtonProps}>Delete</Button>
+                )}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid
+                  container
+                  direction="column"
+                  justify="space-between"
+                  alignItems="stretch"
+                >
+                  {_schema.length > 0 &&
+                    _schema.map((schemaObject, index) => {
+                      return generateForm(schemaObject, index);
+                    })}
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+          </>
         );
       case "checkboxAccordian":
         const checkboxAccordianError = has(errors, name);
@@ -642,15 +707,38 @@ export const Form = ({
                     error={hasFieldError}
                   >
                     <AceEditor
-                      value={value}
-                      onValidate={node => {
+                      value={
+                        typeof value === typeof {}
+                          ? JSON.stringify(value)
+                          : value
+                      }
+                      onValidate={(node) => {
                         if (node.length) {
                           onError(node.filter(err => err.type === "error"));
                         }
                         onError([]);
                       }}
-                      onChange={newValue => {
-                        onChange(newValue);
+                      onChange={(newValue) => {
+
+                        console.log("prevValue-->",jsonPrevValue)
+
+                        
+                        console.log("newvalue-->", newValue)
+                        
+                        if(isJS(newValue)){
+                          try {
+
+                            onChange(JSON.parse( `${newValue}` ));
+                          
+                            jsonPrevValue=newValue
+                          } catch (err) {
+                            onChange(newValue);
+                            jsonPrevValue=newValue
+                          
+                          }}else{
+                          onChange(newValue);
+                          jsonPrevValue=newValue
+                        }
                       }}
                       name={name}
                       setOptions={{
